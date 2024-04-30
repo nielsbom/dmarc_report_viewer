@@ -1,0 +1,20 @@
+# docker-compose.yml
+version: "3.9"
+name: dmarc-report-viewer
+services:
+  dmarc-report-converter:
+    build:
+      context: images/dmarc-report-converter
+    volumes:
+      - ./input:/home/root/input
+      - ./output:/home/root/output
+      - ./config.yaml/:/home/root/config.yaml
+    stop_grace_period: 1s
+  nginx:
+    build:
+      context: images/nginx
+    depends_on:
+      dmarc-report-converter:
+        condition: service_completed_successfully
+    volumes:
+      - ./output:/usr/share/nginx/html
